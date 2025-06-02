@@ -1,0 +1,28 @@
+.login-register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  padding: 2rem;
+}
+
+.login-form {
+  padding: 2rem;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+}
+
+.login-form h1 {
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.login-form .MuiTextField-root {
+  margin-bottom: 1rem;
+}
+
+.login-form .MuiButton-root {
+  padding: 12px;
+  font-size: 1rem;
+}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Divider,
   List,
@@ -8,35 +8,55 @@ import {
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import "./styles.css";
-import models from "../../modelData/models";
+import fetchModel from "../../lib/fetchModelData";
 
 /**
  * Define UserList, a React component of Project 4.
  */
 function UserList() {
-  const users = models.userListModel();
-  
+  const [users, setUsers] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchModel("/user/list")
+      .then((data) => {
+        setUsers(data);
+        setError(null);
+      })
+      .catch((err) => {
+        console.error("Error fetching users:", err);
+        if (err.message === 'Unauthorized') {
+          // User is not logged in, don't show users
+          setUsers([]);
+        } else {
+          setError("Failed to load users");
+        }
+      });
+  }, []);
+
+  if (error) {
+    return (
+      <div>
+        <Typography component="div" variant="body1">
+          {error}
+        </Typography>
+      </div>
+    );
+  }
+
   return (
     <div>
-      <Typography variant="h5" sx={{ padding: "16px 0" }}>
+      <Typography component="div" variant="body1">
         Users
       </Typography>
-      <Divider />
       <List component="nav">
         {users.map((user) => (
-          <React.Fragment key={user._id}>
-            <ListItem 
-              button 
-              component={Link} 
-              to={`/users/${user._id}`}
-              sx={{ textDecoration: 'none', color: 'inherit' }}
-            >
-              <ListItemText 
-                primary={`${user.first_name} ${user.last_name}`} 
-              />
+          <div key={user._id}>
+            <ListItem component={Link} to={`/users/${user._id}`}>
+              <ListItemText primary={`${user.last_name}`} />
             </ListItem>
             <Divider />
-          </React.Fragment>
+          </div>
         ))}
       </List>
     </div>
