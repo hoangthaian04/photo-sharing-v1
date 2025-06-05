@@ -51,16 +51,17 @@ function TopBar({ loggedInUser, onLogout }) {
     }
   }, [path, loggedInUser]);
 
-  const handleLogout = () => {
-    logoutUser()
-      .then(() => {
-        onLogout();
-      })
-      .catch((error) => {
-        console.error("Logout failed:", error);
-        // Still log out on client side even if server request fails
-        onLogout();
-      });
+  const handleLogout = async () => {
+    try {
+      await logoutUser(); // This now handles JWT token removal
+      onLogout();
+      navigate("/login-register");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Still log out on client side even if server request fails
+      onLogout();
+      navigate("/login-register");
+    }
   };
 
   const handleAddPhoto = () => {
@@ -70,7 +71,10 @@ function TopBar({ loggedInUser, onLogout }) {
   return (
     <AppBar className="topbar-appBar" position="absolute">
       <Toolbar>
-        
+        <Typography variant="h6" color="inherit">
+          Photo Sharing App
+        </Typography>
+
         {contextInfo && (
           <Typography variant="h6" color="inherit" sx={{ marginLeft: 2 }}>
             {contextInfo}
@@ -80,9 +84,9 @@ function TopBar({ loggedInUser, onLogout }) {
         <div style={{ flexGrow: 1 }} />
 
         {loggedInUser ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <Button 
-              color="inherit" 
+          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+            <Button
+              color="inherit"
               onClick={handleAddPhoto}
               variant="outlined"
               sx={{ mr: 1 }}
@@ -90,13 +94,9 @@ function TopBar({ loggedInUser, onLogout }) {
               Add Photo
             </Button>
             <Typography variant="body1" color="inherit">
-              Hi {loggedInUser.last_name}
+              Hi {loggedInUser.first_name} {loggedInUser.last_name}
             </Typography>
-            <Button 
-              color="inherit" 
-              onClick={handleLogout}
-              variant="outlined"
-            >
+            <Button color="inherit" onClick={handleLogout} variant="outlined">
               Logout
             </Button>
           </div>

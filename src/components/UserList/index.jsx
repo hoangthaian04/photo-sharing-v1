@@ -18,7 +18,7 @@ function UserList() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchModel("/user/list")
+    fetchModel("/api/user/list")
       .then((data) => {
         setUsers(data);
         setError(null);

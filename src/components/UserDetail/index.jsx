@@ -18,7 +18,7 @@ function UserDetail() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetchModel(`/user/${userId}`)
+    fetchModel(`/api/user/${userId}`)
       .then((data) => {
         setUser(data);
       })

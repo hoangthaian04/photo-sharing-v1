@@ -42,12 +42,12 @@ function UserPhotos() {
       console.log('Fetching data for userId:', userId); // Debug log
       
       // Fetch user details
-      const userData = await fetchModel(`/user/${userId}`);
+      const userData = await fetchModel(`/api/user/${userId}`);
       console.log('User data:', userData); // Debug log
       setUser(userData);
 
       // Fetch photos of user
-      const photosData = await fetchModel(`/photo/photosOfUser/${userId}`);
+      const photosData = await fetchModel(`/api/photo/photosOfUser/${userId}`);
       console.log('Photos data:', photosData); // Debug log
       
       // Đảm bảo photosData là array
@@ -114,7 +114,7 @@ function UserPhotos() {
 
     try {
       // Use correct API endpoint
-      const response = await fetch(`https://lnmx2d-8081.csb.app/api/comment/commentsOfPhoto/${photoId}`, {
+      const response = await fetch(`https://sfk4vy-8081.csb.app/api/comment/commentsOfPhoto/${photoId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -251,7 +251,7 @@ function UserPhotos() {
             <Card key={photo._id} className="photo-card" sx={{ mb: 3 }}>
               <CardMedia
                 component="img"
-                image={`https://lnmx2d-8081.csb.app/images/${photo.file_name}`}
+                image={`https://sfk4vy-8081.csb.app/images/${photo.file_name}`}
                 alt={`Photo by ${user.first_name}`}
                 className="photo-image"
                 sx={{ 
@@ -261,7 +261,7 @@ function UserPhotos() {
                 }}
                 onError={(e) => {
                   console.error('Error loading image:', photo.file_name);
-                  console.error('Full image URL:', `https://lnmx2d-8081.csb.app/images/${photo.file_name}`);
+                  console.error('Full image URL:', `https://sfk4vy-8081.csb.app/images/${photo.file_name}`);
                   e.target.style.display = 'none';
                   // Show error message
                   const errorDiv = document.createElement('div');

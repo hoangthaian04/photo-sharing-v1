@@ -63,7 +63,7 @@ function PhotoUpload({ loggedInUser }) {
       console.log('FormData created, uploading to:', '/api/photos/new'); // Debug log
 
       // Fixed: Use the correct endpoint that matches your backend router
-      const response = await fetch('https://lnmx2d-8081.csb.app/api/photos/new', {
+      const response = await fetch('https://sfk4vy-8081.csb.app/api/photos/new', {
         method: 'POST',
         credentials: 'include', // Important: Include credentials for session
         body: formData,

@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
-import { 
-  Typography, 
-  TextField, 
-  Button, 
-  Paper, 
-  Alert, 
-  Box, 
-  Tabs, 
+import React, { useState } from "react";
+import {
+  Typography,
+  TextField,
+  Button,
+  Paper,
+  Alert,
+  Box,
+  Tabs,
   Tab,
-  Grid
-} from '@mui/material';
-import './styles.css';
+  Grid,
+} from "@mui/material";
+import { loginUser } from "../../lib/fetchModelData";
+import "./styles.css";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -23,84 +24,69 @@ function TabPanel(props) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
-      )}
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
 }
 
 function LoginRegister({ onLogin }) {
   const [tabValue, setTabValue] = useState(0);
-  
+
   // Login states
   const [loginData, setLoginData] = useState({
-    login_name: '',
-    password: ''
+    login_name: "",
+    password: "",
   });
-  const [loginError, setLoginError] = useState('');
+  const [loginError, setLoginError] = useState("");
   const [loginLoading, setLoginLoading] = useState(false);
 
   // Registration states
   const [registerData, setRegisterData] = useState({
-    login_name: '',
-    password: '',
-    confirmPassword: '',
-    first_name: '',
-    last_name: '',
-    location: '',
-    description: '',
-    occupation: ''
+    login_name: "",
+    password: "",
+    confirmPassword: "",
+    first_name: "",
+    last_name: "",
+    location: "",
+    description: "",
+    occupation: "",
   });
-  const [registerError, setRegisterError] = useState('');
-  const [registerSuccess, setRegisterSuccess] = useState('');
+  const [registerError, setRegisterError] = useState("");
+  const [registerSuccess, setRegisterSuccess] = useState("");
   const [registerLoading, setRegisterLoading] = useState(false);
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
     // Clear errors when switching tabs
-    setLoginError('');
-    setRegisterError('');
-    setRegisterSuccess('');
+    setLoginError("");
+    setRegisterError("");
+    setRegisterSuccess("");
   };
 
-  // Handle Login
+  // Handle Login with JWT
   const handleLogin = async (e) => {
     e.preventDefault();
-    
+
     if (!loginData.login_name.trim() || !loginData.password) {
-      setLoginError('Please enter both login name and password');
+      setLoginError("Please enter both login name and password");
       return;
     }
 
     setLoginLoading(true);
-    setLoginError('');
+    setLoginError("");
 
     try {
-      const response = await fetch('https://lnmx2d-8081.csb.app/admin/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          login_name: loginData.login_name.trim(),
-          password: loginData.password
-        })
-      });
+      // Use the updated loginUser function that handles JWT
+      const userData = await loginUser(
+        loginData.login_name.trim(),
+        loginData.password
+      );
 
-      const data = await response.json();
-
-      if (response.ok) {
-        onLogin(data);
-      } else {
-        setLoginError(data.error || 'Login failed');
-      }
+      // The loginUser function now handles token storage automatically
+      onLogin(userData);
     } catch (err) {
-      console.error('Login error:', err);
-      setLoginError('Network error. Please try again.');
+      console.error("Login error:", err);
+      setLoginError(err.message || "Login failed. Please try again.");
     } finally {
       setLoginLoading(false);
     }
@@ -109,45 +95,45 @@ function LoginRegister({ onLogin }) {
   // Handle Registration
   const handleRegister = async (e) => {
     e.preventDefault();
-    
+
     // Validate required fields
     if (!registerData.login_name.trim()) {
-      setRegisterError('Login name is required');
+      setRegisterError("Login name is required");
       return;
     }
 
     if (!registerData.password) {
-      setRegisterError('Password is required');
+      setRegisterError("Password is required");
       return;
     }
 
     if (!registerData.first_name.trim()) {
-      setRegisterError('First name is required');
+      setRegisterError("First name is required");
       return;
     }
 
     if (!registerData.last_name.trim()) {
-      setRegisterError('Last name is required');
+      setRegisterError("Last name is required");
       return;
     }
 
     // Validate password match
     if (registerData.password !== registerData.confirmPassword) {
-      setRegisterError('Passwords do not match');
+      setRegisterError("Passwords do not match");
       return;
     }
 
     setRegisterLoading(true);
-    setRegisterError('');
-    setRegisterSuccess('');
+    setRegisterError("");
+    setRegisterSuccess("");
 
     try {
-      const response = await fetch('https://lnmx2d-8081.csb.app/api/user', {
-        method: 'POST',
+      const response = await fetch("https://sfk4vy-8081.csb.app/api/user", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({
           login_name: registerData.login_name.trim(),
           password: registerData.password,
@@ -155,55 +141,55 @@ function LoginRegister({ onLogin }) {
           last_name: registerData.last_name.trim(),
           location: registerData.location.trim(),
           description: registerData.description.trim(),
-          occupation: registerData.occupation.trim()
-        })
+          occupation: registerData.occupation.trim(),
+        }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        setRegisterSuccess('Registration successful! You can now log in.');
+        setRegisterSuccess("Registration successful! You can now log in.");
         // Clear form
         setRegisterData({
-          login_name: '',
-          password: '',
-          confirmPassword: '',
-          first_name: '',
-          last_name: '',
-          location: '',
-          description: '',
-          occupation: ''
+          login_name: "",
+          password: "",
+          confirmPassword: "",
+          first_name: "",
+          last_name: "",
+          location: "",
+          description: "",
+          occupation: "",
         });
         // Switch to login tab after 2 seconds
         setTimeout(() => {
           setTabValue(0);
-          setRegisterSuccess('');
+          setRegisterSuccess("");
         }, 2000);
       } else {
-        setRegisterError(data.error || 'Registration failed');
+        setRegisterError(data.error || "Registration failed");
       }
     } catch (err) {
-      console.error('Registration error:', err);
-      setRegisterError('Network error. Please try again.');
+      console.error("Registration error:", err);
+      setRegisterError("Network error. Please try again.");
     } finally {
       setRegisterLoading(false);
     }
   };
 
   const handleLoginInputChange = (field, value) => {
-    setLoginData(prev => ({
+    setLoginData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
-    if (loginError) setLoginError('');
+    if (loginError) setLoginError("");
   };
 
   const handleRegisterInputChange = (field, value) => {
-    setRegisterData(prev => ({
+    setRegisterData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
-    if (registerError) setRegisterError('');
+    if (registerError) setRegisterError("");
   };
 
   return (
@@ -212,9 +198,13 @@ function LoginRegister({ onLogin }) {
         <Typography variant="h4" component="h1" gutterBottom align="center">
           Photo Sharing App
         </Typography>
-        
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={tabValue} onChange={handleTabChange} aria-label="login register tabs">
+
+        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+          <Tabs
+            value={tabValue}
+            onChange={handleTabChange}
+            aria-label="login register tabs"
+          >
             <Tab label="Login" />
             <Tab label="Register" />
           </Tabs>
@@ -223,7 +213,7 @@ function LoginRegister({ onLogin }) {
         {/* Login Tab */}
         <TabPanel value={tabValue} index={0}>
           {loginError && (
-            <Alert severity="error" style={{ marginBottom: '1rem' }}>
+            <Alert severity="error" style={{ marginBottom: "1rem" }}>
               {loginError}
             </Alert>
           )}
@@ -233,33 +223,41 @@ function LoginRegister({ onLogin }) {
               fullWidth
               label="Login Name"
               value={loginData.login_name}
-              onChange={(e) => handleLoginInputChange('login_name', e.target.value)}
+              onChange={(e) =>
+                handleLoginInputChange("login_name", e.target.value)
+              }
               margin="normal"
               variant="outlined"
               disabled={loginLoading}
               autoFocus
             />
-            
+
             <TextField
               fullWidth
               label="Password"
               type="password"
               value={loginData.password}
-              onChange={(e) => handleLoginInputChange('password', e.target.value)}
+              onChange={(e) =>
+                handleLoginInputChange("password", e.target.value)
+              }
               margin="normal"
               variant="outlined"
               disabled={loginLoading}
             />
-            
+
             <Button
               type="submit"
               fullWidth
               variant="contained"
               color="primary"
-              disabled={loginLoading || !loginData.login_name.trim() || !loginData.password}
-              style={{ marginTop: '1rem' }}
+              disabled={
+                loginLoading ||
+                !loginData.login_name.trim() ||
+                !loginData.password
+              }
+              style={{ marginTop: "1rem" }}
             >
-              {loginLoading ? 'Logging in...' : 'Login'}
+              {loginLoading ? "Logging in..." : "Login"}
             </Button>
           </form>
         </TabPanel>
@@ -267,13 +265,13 @@ function LoginRegister({ onLogin }) {
         {/* Register Tab */}
         <TabPanel value={tabValue} index={1}>
           {registerError && (
-            <Alert severity="error" style={{ marginBottom: '1rem' }}>
+            <Alert severity="error" style={{ marginBottom: "1rem" }}>
               {registerError}
             </Alert>
           )}
 
           {registerSuccess && (
-            <Alert severity="success" style={{ marginBottom: '1rem' }}>
+            <Alert severity="success" style={{ marginBottom: "1rem" }}>
               {registerSuccess}
             </Alert>
           )}
@@ -285,7 +283,9 @@ function LoginRegister({ onLogin }) {
                   fullWidth
                   label="Login Name *"
                   value={registerData.login_name}
-                  onChange={(e) => handleRegisterInputChange('login_name', e.target.value)}
+                  onChange={(e) =>
+                    handleRegisterInputChange("login_name", e.target.value)
+                  }
                   variant="outlined"
                   disabled={registerLoading}
                 />
@@ -296,7 +296,9 @@ function LoginRegister({ onLogin }) {
                   fullWidth
                   label="First Name *"
                   value={registerData.first_name}
-                  onChange={(e) => handleRegisterInputChange('first_name', e.target.value)}
+                  onChange={(e) =>
+                    handleRegisterInputChange("first_name", e.target.value)
+                  }
                   variant="outlined"
                   disabled={registerLoading}
                 />
@@ -307,7 +309,9 @@ function LoginRegister({ onLogin }) {
                   fullWidth
                   label="Last Name *"
                   value={registerData.last_name}
-                  onChange={(e) => handleRegisterInputChange('last_name', e.target.value)}
+                  onChange={(e) =>
+                    handleRegisterInputChange("last_name", e.target.value)
+                  }
                   variant="outlined"
                   disabled={registerLoading}
                 />
@@ -319,7 +323,9 @@ function LoginRegister({ onLogin }) {
                   label="Password *"
                   type="password"
                   value={registerData.password}
-                  onChange={(e) => handleRegisterInputChange('password', e.target.value)}
+                  onChange={(e) =>
+                    handleRegisterInputChange("password", e.target.value)
+                  }
                   variant="outlined"
                   disabled={registerLoading}
                 />
@@ -331,7 +337,9 @@ function LoginRegister({ onLogin }) {
                   label="Confirm Password *"
                   type="password"
                   value={registerData.confirmPassword}
-                  onChange={(e) => handleRegisterInputChange('confirmPassword', e.target.value)}
+                  onChange={(e) =>
+                    handleRegisterInputChange("confirmPassword", e.target.value)
+                  }
                   variant="outlined"
                   disabled={registerLoading}
                 />
@@ -342,7 +350,9 @@ function LoginRegister({ onLogin }) {
                   fullWidth
                   label="Location"
                   value={registerData.location}
-                  onChange={(e) => handleRegisterInputChange('location', e.target.value)}
+                  onChange={(e) =>
+                    handleRegisterInputChange("location", e.target.value)
+                  }
                   variant="outlined"
                   disabled={registerLoading}
                 />
@@ -353,7 +363,9 @@ function LoginRegister({ onLogin }) {
                   fullWidth
                   label="Occupation"
                   value={registerData.occupation}
-                  onChange={(e) => handleRegisterInputChange('occupation', e.target.value)}
+                  onChange={(e) =>
+                    handleRegisterInputChange("occupation", e.target.value)
+                  }
                   variant="outlined"
                   disabled={registerLoading}
                 />
@@ -366,7 +378,9 @@ function LoginRegister({ onLogin }) {
                   multiline
                   rows={3}
                   value={registerData.description}
-                  onChange={(e) => handleRegisterInputChange('description', e.target.value)}
+                  onChange={(e) =>
+                    handleRegisterInputChange("description", e.target.value)
+                  }
                   variant="outlined"
                   disabled={registerLoading}
                 />
@@ -379,9 +393,9 @@ function LoginRegister({ onLogin }) {
                   variant="contained"
                   color="secondary"
                   disabled={registerLoading}
-                  style={{ marginTop: '1rem' }}
+                  style={{ marginTop: "1rem" }}
                 >
-                  {registerLoading ? 'Registering...' : 'Register Me'}
+                  {registerLoading ? "Registering..." : "Register Me"}
                 </Button>
               </Grid>
             </Grid>
